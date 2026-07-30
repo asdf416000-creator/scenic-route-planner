@@ -12,9 +12,7 @@
     href="https://fonts.googleapis.com/css2?family=Song+Myung&family=Black+Han+Sans&family=Gowun+Dodum&family=Noto+Sans+JP:wght@400;700&family=Noto+Sans+KR:wght@400;700&display=swap"
     rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-  <!-- Leaflet Interactive Map CSS -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
   <!-- Naver Maps API v3 -->
   <script type="text/javascript"
     src="https://oapi.map.naver.com/openapi/v3/maps.js?ncpClientId=sfawv2t2xq&submodules=geocoding"></script>
@@ -5352,32 +5350,32 @@
       updateFavCount();
     });
 
-    let clickPopup = null;
-    let isNaverMap = false;
+        let clickPopup = null;
 
-    // Initialize Map with Hybrid Naver Map API / Leaflet Support & Multilingual Click-to-Pin Handler
+    // Initialize Naver Maps API v3 Interactive Map with Multilingual Click-to-Pin Handler
     function initNativeMap() {
       const container = document.getElementById('leafletMap');
       if (!container) return;
 
-      // 1. Try Naver Maps API v3 first if loaded with valid Client ID
-      if (typeof naver !== 'undefined' && naver.maps) {
-        try {
-          isNaverMap = true;
-          leafletMap = new naver.maps.Map(container, {
-            center: new naver.maps.LatLng(35.1500, 129.0800),
-            zoom: 11,
-            zoomControl: true,
-            zoomControlOptions: { position: naver.maps.Position.TOP_RIGHT }
-          });
+      if (typeof naver === 'undefined' || !naver.maps) {
+        console.warn('Naver Maps API v3 not loaded');
+        return;
+      }
 
-          naver.maps.Event.addListener(leafletMap, 'click', (e) => {
-            const lat = e.coord.lat();
-            const lng = e.coord.lng();
-            const t = translations[currentLang] || {};
+      leafletMap = new naver.maps.Map(container, {
+        center: new naver.maps.LatLng(35.1500, 129.0800),
+        zoom: 11,
+        zoomControl: true,
+        zoomControlOptions: { position: naver.maps.Position.TOP_RIGHT }
+      });
 
-            const popupContent = `
-          <div style="text-align:center; padding: 6px; color: #0f172a; font-family: sans-serif;">
+      naver.maps.Event.addListener(leafletMap, 'click', (e) => {
+        const lat = e.coord.lat();
+        const lng = e.coord.lng();
+        const t = translations[currentLang] || {};
+
+        const popupContent = `
+          <div style="text-align:center; padding: 8px; color: #0f172a; font-family: sans-serif;">
             <p style="margin-bottom:8px; font-weight:700; font-size:0.9rem; color: #0f172a;">${t.mapPinPopupTitle || '📍 지도 선택 위치'}</p>
             <div style="display:flex; gap:6px; justify-content:center;">
               <button id="btnPinStart" style="padding:6px 12px; background:#ff6f52; color:#ffffff; border:none; border-radius:15px; font-size:0.8rem; font-weight:700; cursor:pointer;">
@@ -5390,86 +5388,17 @@
           </div>
         `;
 
-            if (clickPopup && clickPopup.close) clickPopup.close();
+        if (clickPopup && clickPopup.close) clickPopup.close();
 
-            clickPopup = new naver.maps.InfoWindow({
-              content: popupContent,
-              borderWidth: 1,
-              borderColor: '#ff6f52',
-              backgroundColor: '#ffffff',
-              borderRadius: '12px'
-            });
+        clickPopup = new naver.maps.InfoWindow({
+          content: popupContent,
+          borderWidth: 1,
+          borderColor: '#ff6f52',
+          backgroundColor: '#ffffff',
+          borderRadius: '12px'
+        });
 
-            clickPopup.open(leafletMap, e.coord);
-
-            setTimeout(() => {
-              const pinStartBtn = document.getElementById('btnPinStart');
-              const pinEndBtn = document.getElementById('btnPinEnd');
-
-              if (pinStartBtn) {
-                pinStartBtn.onclick = () => {
-                  customStartCoord = [lat, lng];
-                  const pinLabel = t.mapPinLabel || '지도 핀';
-                  startCustomInput.value = `${pinLabel} (${lat.toFixed(4)}, ${lng.toFixed(4)})`;
-                  clickPopup.close();
-                  renderRouteResult();
-                };
-              }
-
-              if (pinEndBtn) {
-                pinEndBtn.onclick = () => {
-                  customEndCoord = [lat, lng];
-                  const pinLabel = t.mapPinLabel || '지도 핀';
-                  endCustomInput.value = `${pinLabel} (${lat.toFixed(4)}, ${lng.toFixed(4)})`;
-                  clickPopup.close();
-                  renderRouteResult();
-                };
-              }
-            }, 50);
-          });
-          return;
-        } catch (err) {
-          console.warn('Naver Map API init fallback to Leaflet:', err);
-        }
-      }
-
-      // 2. Fallback to OpenSource Leaflet Map
-      if (typeof L === 'undefined') return;
-
-      isNaverMap = false;
-      leafletMap = L.map(container).setView([35.1500, 129.0800], 11);
-
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 19,
-        attribution: '&copy; OpenStreetMap'
-      }).addTo(leafletMap);
-
-      leafletMap.on('click', (e) => {
-        const lat = e.latlng.lat;
-        const lng = e.latlng.lng;
-        const t = translations[currentLang] || {};
-
-        const popupContent = `
-      <div style="text-align:center; padding: 6px; color: #0f172a; font-family: sans-serif;">
-        <p style="margin-bottom:8px; font-weight:700; font-size:0.9rem; color: #0f172a;">${t.mapPinPopupTitle || '📍 지도 선택 위치'}</p>
-        <div style="display:flex; gap:6px; justify-content:center;">
-          <button id="btnPinStart" style="padding:6px 12px; background:#ff6f52; color:#ffffff; border:none; border-radius:15px; font-size:0.8rem; font-weight:700; cursor:pointer; box-shadow: 0 2px 6px rgba(0,0,0,0.2);">
-            ${t.mapPinSetStart || '🚩 출발지로 지정'}
-          </button>
-          <button id="btnPinEnd" style="padding:6px 12px; background:#f0b642; color:#000000; border:none; border-radius:15px; font-size:0.8rem; font-weight:700; cursor:pointer; box-shadow: 0 2px 6px rgba(0,0,0,0.2);">
-            ${t.mapPinSetEnd || '🏁 목적지로 지정'}
-          </button>
-        </div>
-      </div>
-    `;
-
-        clickPopup = L.popup({
-          closeButton: true,
-          className: 'custom-leaflet-popup'
-        })
-          .setLatLng(e.latlng)
-          .setContent(popupContent)
-          .openOn(leafletMap);
+        clickPopup.open(leafletMap, e.coord);
 
         setTimeout(() => {
           const pinStartBtn = document.getElementById('btnPinStart');
@@ -5480,7 +5409,7 @@
               customStartCoord = [lat, lng];
               const pinLabel = t.mapPinLabel || '지도 핀';
               startCustomInput.value = `${pinLabel} (${lat.toFixed(4)}, ${lng.toFixed(4)})`;
-              leafletMap.closePopup();
+              clickPopup.close();
               renderRouteResult();
             };
           }
@@ -5490,7 +5419,7 @@
               customEndCoord = [lat, lng];
               const pinLabel = t.mapPinLabel || '지도 핀';
               endCustomInput.value = `${pinLabel} (${lat.toFixed(4)}, ${lng.toFixed(4)})`;
-              leafletMap.closePopup();
+              clickPopup.close();
               renderRouteResult();
             };
           }
