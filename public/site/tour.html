@@ -5350,7 +5350,26 @@
       updateFavCount();
     });
 
-        let clickPopup = null;
+            // Naver Map Auth Failure Callback Handler
+    window.naver_map_auth_failure = function () {
+      console.error('Naver Maps API Authentication Failed');
+      const container = document.getElementById('leafletMap');
+      if (container) {
+        container.innerHTML = `
+          <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; padding:20px; text-align:center; background:rgba(255, 111, 82, 0.08); border-radius:16px; border:1px dashed #ff6f52; color:#fff;">
+            <p style="font-size:1.1rem; font-weight:700; color:#ff6f52; margin-bottom:8px;">⚠️ 네이버 지도 API 인증 실패 (OpenAPI Auth Failed)</p>
+            <p style="font-size:0.9rem; color:var(--text-sub); max-width:600px; margin-bottom:12px; line-height:1.5;">
+              네이버 클라우드 플랫폼 계정에 결제 수단이 미등록되어 있거나, Client ID가 비활성화 상태입니다.
+            </p>
+            <p style="font-size:0.85rem; color:var(--text-muted);">
+              Client ID: <code style="color:#f0b642; background:rgba(0,0,0,0.3); padding:2px 8px; border-radius:4px;">sfawv2t2xq</code>
+            </p>
+          </div>
+        `;
+      }
+    };
+
+    let clickPopup = null;
 
     // Initialize Naver Maps API v3 Interactive Map with Multilingual Click-to-Pin Handler
     function initNativeMap() {
