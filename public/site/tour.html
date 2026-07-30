@@ -15,6 +15,9 @@
   <!-- Leaflet Interactive Map CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <!-- Naver Maps API v3 -->
+  <script type="text/javascript"
+    src="https://oapi.map.naver.com/openapi/v3/maps.js?ncpClientId=sfawv2t2xq&submodules=geocoding"></script>
   <style>
     /* Busan Tourism Portal Design System - Glassmorphic Dark Premium Theme */
 
@@ -5350,17 +5353,90 @@
     });
 
     let clickPopup = null;
+    let isNaverMap = false;
 
-    // Initialize Interactive Leaflet Map with Multilingual Click-to-Pin Handler
+    // Initialize Map with Hybrid Naver Map API / Leaflet Support & Multilingual Click-to-Pin Handler
     function initNativeMap() {
       const container = document.getElementById('leafletMap');
       if (!container) return;
 
-      if (typeof L === 'undefined') {
-        console.warn('Leaflet Map API not loaded');
-        return;
+      // 1. Try Naver Maps API v3 first if loaded with valid Client ID
+      if (typeof naver !== 'undefined' && naver.maps) {
+        try {
+          isNaverMap = true;
+          leafletMap = new naver.maps.Map(container, {
+            center: new naver.maps.LatLng(35.1500, 129.0800),
+            zoom: 11,
+            zoomControl: true,
+            zoomControlOptions: { position: naver.maps.Position.TOP_RIGHT }
+          });
+
+          naver.maps.Event.addListener(leafletMap, 'click', (e) => {
+            const lat = e.coord.lat();
+            const lng = e.coord.lng();
+            const t = translations[currentLang] || {};
+
+            const popupContent = `
+          <div style="text-align:center; padding: 6px; color: #0f172a; font-family: sans-serif;">
+            <p style="margin-bottom:8px; font-weight:700; font-size:0.9rem; color: #0f172a;">${t.mapPinPopupTitle || '📍 지도 선택 위치'}</p>
+            <div style="display:flex; gap:6px; justify-content:center;">
+              <button id="btnPinStart" style="padding:6px 12px; background:#ff6f52; color:#ffffff; border:none; border-radius:15px; font-size:0.8rem; font-weight:700; cursor:pointer;">
+                ${t.mapPinSetStart || '🚩 출발지로 지정'}
+              </button>
+              <button id="btnPinEnd" style="padding:6px 12px; background:#f0b642; color:#000000; border:none; border-radius:15px; font-size:0.8rem; font-weight:700; cursor:pointer;">
+                ${t.mapPinSetEnd || '🏁 목적지로 지정'}
+              </button>
+            </div>
+          </div>
+        `;
+
+            if (clickPopup && clickPopup.close) clickPopup.close();
+
+            clickPopup = new naver.maps.InfoWindow({
+              content: popupContent,
+              borderWidth: 1,
+              borderColor: '#ff6f52',
+              backgroundColor: '#ffffff',
+              borderRadius: '12px'
+            });
+
+            clickPopup.open(leafletMap, e.coord);
+
+            setTimeout(() => {
+              const pinStartBtn = document.getElementById('btnPinStart');
+              const pinEndBtn = document.getElementById('btnPinEnd');
+
+              if (pinStartBtn) {
+                pinStartBtn.onclick = () => {
+                  customStartCoord = [lat, lng];
+                  const pinLabel = t.mapPinLabel || '지도 핀';
+                  startCustomInput.value = `${pinLabel} (${lat.toFixed(4)}, ${lng.toFixed(4)})`;
+                  clickPopup.close();
+                  renderRouteResult();
+                };
+              }
+
+              if (pinEndBtn) {
+                pinEndBtn.onclick = () => {
+                  customEndCoord = [lat, lng];
+                  const pinLabel = t.mapPinLabel || '지도 핀';
+                  endCustomInput.value = `${pinLabel} (${lat.toFixed(4)}, ${lng.toFixed(4)})`;
+                  clickPopup.close();
+                  renderRouteResult();
+                };
+              }
+            }, 50);
+          });
+          return;
+        } catch (err) {
+          console.warn('Naver Map API init fallback to Leaflet:', err);
+        }
       }
 
+      // 2. Fallback to OpenSource Leaflet Map
+      if (typeof L === 'undefined') return;
+
+      isNaverMap = false;
       leafletMap = L.map(container).setView([35.1500, 129.0800], 11);
 
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -5391,9 +5467,9 @@
           closeButton: true,
           className: 'custom-leaflet-popup'
         })
-        .setLatLng(e.latlng)
-        .setContent(popupContent)
-        .openOn(leafletMap);
+          .setLatLng(e.latlng)
+          .setContent(popupContent)
+          .openOn(leafletMap);
 
         setTimeout(() => {
           const pinStartBtn = document.getElementById('btnPinStart');
