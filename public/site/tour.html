@@ -14,6 +14,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <!-- Leaflet Interactive Map CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <style>
     /* Busan Tourism Portal Design System - Glassmorphic Dark Premium Theme */
 
@@ -5348,56 +5349,51 @@
       updateFavCount();
     });
 
-    // Initialize Naver Interactive Map with Multilingual Click-to-Pin Handler
+    let clickPopup = null;
+
+    // Initialize Interactive Leaflet Map with Multilingual Click-to-Pin Handler
     function initNativeMap() {
       const container = document.getElementById('leafletMap');
       if (!container) return;
 
-      // Fallback check if Naver maps script loaded
-      if (typeof naver === 'undefined' || !naver.maps) {
-        console.warn('Naver Map API not loaded');
+      if (typeof L === 'undefined') {
+        console.warn('Leaflet Map API not loaded');
         return;
       }
 
-      leafletMap = new naver.maps.Map(container, {
-        center: new naver.maps.LatLng(35.1500, 129.0800),
-        zoom: 11,
-        zoomControl: true,
-        zoomControlOptions: {
-          position: naver.maps.Position.TOP_RIGHT
-        }
-      });
+      leafletMap = L.map(container).setView([35.1500, 129.0800], 11);
 
-      naver.maps.Event.addListener(leafletMap, 'click', (e) => {
-        const lat = e.coord.lat();
-        const lng = e.coord.lng();
-        const t = translations[currentLang];
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; OpenStreetMap'
+      }).addTo(leafletMap);
+
+      leafletMap.on('click', (e) => {
+        const lat = e.latlng.lat;
+        const lng = e.latlng.lng;
+        const t = translations[currentLang] || {};
 
         const popupContent = `
-      <div style="text-align:center; padding: 10px; color: #0f172a; font-family: sans-serif;">
-        <p style="margin-bottom:8px; font-weight:700; font-size:0.9rem;">${t.mapPinPopupTitle}</p>
+      <div style="text-align:center; padding: 6px; color: #0f172a; font-family: sans-serif;">
+        <p style="margin-bottom:8px; font-weight:700; font-size:0.9rem; color: #0f172a;">${t.mapPinPopupTitle || '📍 지도 선택 위치'}</p>
         <div style="display:flex; gap:6px; justify-content:center;">
-          <button id="btnPinStart" style="padding:6px 12px; background:#ff6f52; color:#000; border:none; border-radius:15px; font-size:0.8rem; font-weight:700; cursor:pointer;">
-            ${t.mapPinSetStart}
+          <button id="btnPinStart" style="padding:6px 12px; background:#ff6f52; color:#ffffff; border:none; border-radius:15px; font-size:0.8rem; font-weight:700; cursor:pointer; box-shadow: 0 2px 6px rgba(0,0,0,0.2);">
+            ${t.mapPinSetStart || '🚩 출발지로 지정'}
           </button>
-          <button id="btnPinEnd" style="padding:6px 12px; background:#ffb703; color:#000; border:none; border-radius:15px; font-size:0.8rem; font-weight:700; cursor:pointer;">
-            ${t.mapPinSetEnd}
+          <button id="btnPinEnd" style="padding:6px 12px; background:#f0b642; color:#000000; border:none; border-radius:15px; font-size:0.8rem; font-weight:700; cursor:pointer; box-shadow: 0 2px 6px rgba(0,0,0,0.2);">
+            ${t.mapPinSetEnd || '🏁 목적지로 지정'}
           </button>
         </div>
       </div>
     `;
 
-        if (clickPopup) clickPopup.close();
-
-        clickPopup = new naver.maps.InfoWindow({
-          content: popupContent,
-          borderWidth: 1,
-          borderColor: '#ff6f52',
-          backgroundColor: '#ffffff',
-          borderRadius: '12px'
-        });
-
-        clickPopup.open(leafletMap, e.coord);
+        clickPopup = L.popup({
+          closeButton: true,
+          className: 'custom-leaflet-popup'
+        })
+        .setLatLng(e.latlng)
+        .setContent(popupContent)
+        .openOn(leafletMap);
 
         setTimeout(() => {
           const pinStartBtn = document.getElementById('btnPinStart');
@@ -5408,7 +5404,7 @@
               customStartCoord = [lat, lng];
               const pinLabel = t.mapPinLabel || '지도 핀';
               startCustomInput.value = `${pinLabel} (${lat.toFixed(4)}, ${lng.toFixed(4)})`;
-              clickPopup.close();
+              leafletMap.closePopup();
               renderRouteResult();
             };
           }
@@ -5418,11 +5414,11 @@
               customEndCoord = [lat, lng];
               const pinLabel = t.mapPinLabel || '지도 핀';
               endCustomInput.value = `${pinLabel} (${lat.toFixed(4)}, ${lng.toFixed(4)})`;
-              clickPopup.close();
+              leafletMap.closePopup();
               renderRouteResult();
             };
           }
-        }, 100);
+        }, 50);
       });
     }
 
@@ -5461,56 +5457,50 @@
       return getCoordsForPlace(text, isStart);
     }
 
-    // Update Naver Interactive Map Route
+    // Update Interactive Leaflet Map Route
     async function updateMapRoute(startText, endText) {
-      if (!leafletMap || typeof naver === 'undefined' || !naver.maps) return;
+      if (!leafletMap || typeof L === 'undefined') return;
 
-      if (startMarker) startMarker.setMap(null);
-      if (endMarker) endMarker.setMap(null);
-      if (routeLine) routeLine.setMap(null);
+      if (startMarker) leafletMap.removeLayer(startMarker);
+      if (endMarker) leafletMap.removeLayer(endMarker);
+      if (routeLine) routeLine.removeLayer(routeLine);
 
       const [sCoord, eCoord] = await Promise.all([
         resolvePlaceCoord(startText, true),
         resolvePlaceCoord(endText, false)
       ]);
 
-      const startPos = new naver.maps.LatLng(sCoord[0], sCoord[1]);
-      const endPos = new naver.maps.LatLng(eCoord[0], eCoord[1]);
+      if (!sCoord || !eCoord) return;
 
       const startLbl = currentLang === 'ja' ? '出発地' : (currentLang === 'ko' ? '출발지' : 'Origin');
       const endLbl = currentLang === 'ja' ? '目的地' : (currentLang === 'ko' ? '목적지' : 'Destination');
 
-      startMarker = new naver.maps.Marker({
-        position: startPos,
-        map: leafletMap,
-        title: `${startLbl}: ${startText}`,
-        icon: {
-          content: '<div style="font-size:26px; filter:drop-shadow(0 2px 5px rgba(0,0,0,0.6));">🚩</div>',
-          anchor: new naver.maps.Point(15, 15)
-        }
+      const redIcon = L.divIcon({
+        html: '<div style="font-size:28px; filter:drop-shadow(0 2px 5px rgba(0,0,0,0.6)); cursor:pointer;">🚩</div>',
+        className: 'custom-map-pin',
+        iconSize: [30, 30],
+        iconAnchor: [15, 15]
       });
 
-      endMarker = new naver.maps.Marker({
-        position: endPos,
-        map: leafletMap,
-        title: `${endLbl}: ${endText}`,
-        icon: {
-          content: '<div style="font-size:26px; filter:drop-shadow(0 2px 5px rgba(0,0,0,0.6));">🏁</div>',
-          anchor: new naver.maps.Point(15, 15)
-        }
+      const goldIcon = L.divIcon({
+        html: '<div style="font-size:28px; filter:drop-shadow(0 2px 5px rgba(0,0,0,0.6)); cursor:pointer;">🏁</div>',
+        className: 'custom-map-pin',
+        iconSize: [30, 30],
+        iconAnchor: [15, 15]
       });
 
-      routeLine = new naver.maps.Polyline({
-        map: leafletMap,
-        path: [startPos, endPos],
-        strokeColor: '#ff6f52',
-        strokeWeight: 5,
-        strokeOpacity: 0.85,
-        strokeStyle: 'dash'
-      });
+      startMarker = L.marker([sCoord[0], sCoord[1]], { icon: redIcon, title: `${startLbl}: ${startText}` }).addTo(leafletMap);
+      endMarker = L.marker([eCoord[0], eCoord[1]], { icon: goldIcon, title: `${endLbl}: ${endText}` }).addTo(leafletMap);
 
-      const bounds = new naver.maps.LatLngBounds(startPos, endPos);
-      leafletMap.fitBounds(bounds, { top: 50, right: 50, bottom: 50, left: 50 });
+      routeLine = L.polyline([[sCoord[0], sCoord[1]], [eCoord[0], eCoord[1]]], {
+        color: '#ff6f52',
+        weight: 5,
+        opacity: 0.85,
+        dashArray: '8, 8'
+      }).addTo(leafletMap);
+
+      const bounds = L.latLngBounds([[sCoord[0], sCoord[1]], [eCoord[0], eCoord[1]]]);
+      leafletMap.fitBounds(bounds, { padding: [50, 50] });
     }
 
     // Language Switcher Logic
