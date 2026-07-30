@@ -5214,11 +5214,23 @@ function getLangArray(objOrArr, lang) {
   return objOrArr[lang] || objOrArr['ja'] || objOrArr['ko'] || [];
 }
 
+// Category-based fallback photos (used when a spot has no local photo yet)
+const categoryFallbackImage = {
+  beach: './images/_fallback-beach.jpg',
+  food: './images/_fallback-food.jpg',
+  cafe: './images/_fallback-cafe.jpg',
+  culture: './images/_fallback-culture.jpg'
+};
+
+function fallbackImgUrl(category) {
+  return categoryFallbackImage[category] || categoryFallbackImage.culture;
+}
+
 // Resolve Local & External Image Paths Robustly
-function resolveImgUrl(imgPath) {
-  if (!imgPath) return 'https://picsum.photos/seed/busan/600/400';
+function resolveImgUrl(imgPath, category) {
+  if (!imgPath) return fallbackImgUrl(category);
   if (imgPath.startsWith('http://') || imgPath.startsWith('https://')) return imgPath;
-  var cleanName = imgPath.replace(/^\.?\/?(public\/)?images\//, '');
+  var cleanName = imgPath.replace(/^\.?\/?(public\/)?images\//, '').normalize('NFC');
   return './images/' + encodeURIComponent(cleanName);
 }
 
