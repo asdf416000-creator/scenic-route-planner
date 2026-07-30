@@ -5860,12 +5860,17 @@ function renderRouteResult() {
   const sInfo = getLocationQuery(startText, true);
   const eInfo = getLocationQuery(endText, false);
 
-  let naverNavUrl = '';
-  if (sInfo.isCoord && eInfo.isCoord) {
-    naverNavUrl = `https://m.map.naver.com/route/public.naver?slat=${sInfo.lat}&slng=${sInfo.lng}&sname=${encodeURIComponent(sInfo.text)}&elat=${eInfo.lat}&elng=${eInfo.lng}&ename=${encodeURIComponent(eInfo.text)}`;
-  } else {
-    naverNavUrl = `https://m.map.naver.com/route/public.naver?sname=${encodeURIComponent(sInfo.text)}&dname=${encodeURIComponent(eInfo.text)}`;
-  }
+  const buildNaverNavUrl = (sLat, sLng, sName, eLat, eLng, eName) =>
+    `https://m.map.naver.com/route/public.naver?slat=${sLat}&slng=${sLng}&sname=${encodeURIComponent(sName)}&elat=${eLat}&elng=${eLng}&ename=${encodeURIComponent(eName)}`;
+
+  // Immediate (synchronous) fallback: preset/approximate coords so the link is
+  // never generated without slat/slng — Naver's route page needs coordinates.
+  const sFallback = sInfo.isCoord ? [sInfo.lat, sInfo.lng] : getCoordsForPlace(startText, true);
+  const eFallback = eInfo.isCoord ? [eInfo.lat, eInfo.lng] : getCoordsForPlace(endText, false);
+  let naverNavUrl = buildNaverNavUrl(
+    sFallback[0], sFallback[1], sInfo.text,
+    eFallback[0], eFallback[1], eInfo.text
+  );
 
   let googleOrigin = sInfo.isCoord ? `${sInfo.lat},${sInfo.lng}` : encodeURIComponent(sInfo.text);
   let googleDest = eInfo.isCoord ? `${eInfo.lat},${eInfo.lng}` : encodeURIComponent(eInfo.text);
@@ -5916,6 +5921,18 @@ function renderRouteResult() {
       </a>
     </div>
   `;
+
+  // Upgrade the Naver link with geocoded coordinates once they resolve.
+  Promise.all([
+    resolvePlaceCoord(startText, true),
+    resolvePlaceCoord(endText, false)
+  ]).then(([sCoord, eCoord]) => {
+    if (!sCoord || !eCoord) return;
+    const link = routeResult.querySelector('.btn-naver');
+    if (link) {
+      link.href = buildNaverNavUrl(sCoord[0], sCoord[1], sInfo.text, eCoord[0], eCoord[1], eInfo.text);
+    }
+  }).catch(() => {});
 }
 
 </script>
