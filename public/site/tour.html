@@ -1811,28 +1811,28 @@
     <div class="route-card">
       <div class="route-form">
         <div class="form-group">
-          <label id="startLocLabel">🚩 出発地 (直接入力・選択・地図クリック)</label>
+          <label id="startLocLabel">🚩 출발지 (직접 입력, 선택 또는 지도 클릭)</label>
           <input type="text" class="custom-input" id="startCustomInput" list="startPresets"
-            placeholder="例: 沙上ターミナル, 釜山駅, 金海空港..." value="沙上ターミナル" />
+            placeholder="예: 사상터미널, 부산역, 김해공항..." value="사상터미널" />
           <datalist id="startPresets">
-            <option value="沙上ターミナル"></option>
-            <option value="釜山駅"></option>
-            <option value="金海空港"></option>
-            <option value="西面駅"></option>
-            <option value="海雲台駅"></option>
+            <option value="사상터미널"></option>
+            <option value="부산역"></option>
+            <option value="김해공항"></option>
+            <option value="서면역"></option>
+            <option value="해운대역"></option>
           </datalist>
         </div>
         <div class="form-group">
-          <label id="endLocLabel">🏁 目的地 (直接入力・選択・地図クリック)</label>
+          <label id="endLocLabel">🏁 목적지 (직접 입력, 선택 또는 지도 클릭)</label>
           <input type="text" class="custom-input" id="endCustomInput" list="endPresets"
-            placeholder="例: 海雲台海水浴場, 広安里, 甘川文化村..." value="海雲台海水浴場" />
+            placeholder="예: 해운대해수욕장, 광안리, 감천문화마을..." value="해운대해수욕장" />
           <datalist id="endPresets">
-            <option value="海雲台海水浴場"></option>
-            <option value="広安里海水浴場"></option>
-            <option value="甘川文化村"></option>
-            <option value="海東龍宮寺"></option>
-            <option value="チャガルチ市場"></option>
-            <option value="太宗台"></option>
+            <option value="해운대해수욕장"></option>
+            <option value="광안리해수욕장"></option>
+            <option value="감천문화마을"></option>
+            <option value="해동용궁사"></option>
+            <option value="자갈치시장"></option>
+            <option value="태종대"></option>
           </datalist>
         </div>
         <button class="btn-primary" id="calcRouteBtn" style="padding: 14px 28px;">
@@ -1858,22 +1858,22 @@
     <div style="margin-top: 50px;">
       <h3 class="section-title" style="font-size: 1.5rem; text-align: left;" id="tourCoursesTitle">🗺️ おすすめ1日モデルコース</h3>
       <div class="courses-grid">
-        <div class="course-card" style="cursor:pointer;" onclick="setPresetRoute('釜山駅', '海雲台海水浴場')">
-          <div class="course-title" id="course1Title">🌟 釜山王道1日満喫コース</div>
+        <div class="course-card" id="course1Card" style="cursor:pointer;" onclick="setPresetRoute('부산역', '해운대해수욕장')">
+          <div class="course-title" id="course1Title">🌟 부산 시그니처 1일 코스</div>
           <div class="course-desc" id="course1Desc">
-            釜山駅 ➔ 甘川文化村 ➔ チャガルチ市場 ➔ 広安里 ➔ 海雲台 (クリックで表示)
+            부산역 ➔ 감천문화마을 ➔ 자갈치시장 ➔ 광안리 ➔ 해운대 (클릭시 길찾기)
           </div>
         </div>
-        <div class="course-card" style="cursor:pointer;" onclick="setPresetRoute('海雲台駅', '海東龍宮寺')">
-          <div class="course-title" id="course2Title">🌊 東釜山オーシャン絶景コース</div>
+        <div class="course-card" id="course2Card" style="cursor:pointer;" onclick="setPresetRoute('해운대역', '해동용궁사')">
+          <div class="course-title" id="course2Title">🌊 동부산 오션 스팟 코스</div>
           <div class="course-desc" id="course2Desc">
-            海雲台 ➔ 月見路 ➔ 海東龍宮寺 ➔ 機張 (クリックで表示)
+            해운대 ➔ 달맞이길 ➔ 해동용궁사 ➔ 기장 오시리아 (클릭시 길찾기)
           </div>
         </div>
-        <div class="course-card" style="cursor:pointer;" onclick="setPresetRoute('沙上ターミナル', '甘川文化村')">
-          <div class="course-title" id="course3Title">🏛️ 原都心レトロ歴史コース</div>
+        <div class="course-card" id="course3Card" style="cursor:pointer;" onclick="setPresetRoute('부산역', '태종대')">
+          <div class="course-title" id="course3Title">🏛️ 원도심 뉴트로 코스</div>
           <div class="course-desc" id="course3Desc">
-            沙上ターミナル ➔ 草梁イバグ路 ➔ 龍頭山公園 ➔ 太宗台 (クリックで表示)
+            부산역 ➔ 초량 이바구길 ➔ 용두산공원 ➔ 영도 태종대 (클릭시 길찾기)
           </div>
         </div>
       </div>
@@ -1983,7 +1983,7 @@
         routeDesc: "出発地と目的地を選択または地図上をクリックして、最適ルートとナビゲーションを表示します。",
         startLoc: "🚩 出発地 (直接入力・選択・地図クリック)",
         endLoc: "🏁 目的地 (直接入力・選択・地図クリック)",
-        calcBtn: "🚀 ルートを検索する",
+        startPlaceholder: "例: 沙上ターミナル, 釜山駅, 金海空港...", endPlaceholder: "例: 海雲台海水浴場, 広安里, 甘川文化村...", startPresets: ["沙上ターミナル", "釜山駅", "金海空港", "西面駅", "海雲台駅"], endPresets: ["海雲台海水浴場", "広安里海水浴場", "甘川文化村", "海東龍宮寺", "チャガルチ市場", "太宗台"], defaultStartVal: "沙上ターミナル", defaultEndVal: "海雲台海水浴場", course1Start: "釜山駅", course1End: "海雲台海水浴場", course2Start: "海雲台駅", course2End: "海東龍宮寺", course3Start: "釜山駅", course3End: "太宗台", calcBtn: "🚀 ルートを検索する",
         mapInstructionBanner: "💡 <strong>マップ操作ヒント:</strong> 地図上の任意の場所をクリックすると「🚩 出発地に指定」または「🏁 目的地に指定」ポップアップが表示され、ピンを自由に設置できます！",
         routeResultBannerTitle: "📍 マップルート表示: ",
         routeResultBannerDesc: "💡 地図ピンの位置座標がリアルタイムで連動しています。",
@@ -2001,7 +2001,7 @@
         course2Title: "🌊 東釜山オーシャン絶景コース",
         course2Desc: "海雲台 ➔ 月見路 ➔ 海東龍宮寺 ➔ 機張 (クリックで表示)",
         course3Title: "🏛️ 原都心レトロ歴史コース",
-        course3Desc: "沙上ターミナル ➔ 草梁イバグ路 ➔ 龍頭山公園 ➔ 太宗台 (クリックで表示)",
+        course3Desc: "釜山駅 ➔ 草梁イバグ路 ➔ 龍頭山公園 ➔ 太宗台 (クリックで表示)",
         guideTitle: " 釜山交通便利ガイド",
         guide1Title: " 交通カード (WOWPASS / T-money)",
         guide1Desc: "地下鉄やバス、コンビニで使える交通カード。釜山駅や空港で簡単に購入・チャージが可能です。",
@@ -2064,7 +2064,7 @@
         routeDesc: "출발지와 목적지를 선택하시면 최적 이동 경로, 소요시간 및 네이버/구글 지도 연동 길찾기를 제공합니다.",
         startLoc: "🚩 출발지 (직접 입력, 선택 또는 지도 클릭)",
         endLoc: "🏁 목적지 (직접 입력, 선택 또는 지도 클릭)",
-        calcBtn: "🚀 최적 길찾기 경로 검색",
+        startPlaceholder: "예: 사상터미널, 부산역, 김해공항...", endPlaceholder: "예: 해운대해수욕장, 광안리, 감천문화마을...", startPresets: ["사상터미널", "부산역", "김해공항", "서면역", "해운대역"], endPresets: ["해운대해수욕장", "광안리해수욕장", "감천문화마을", "해동용궁사", "자갈치시장", "태종대"], defaultStartVal: "사상터미널", defaultEndVal: "해운대해수욕장", course1Start: "부산역", course1End: "해운대해수욕장", course2Start: "해운대역", course2End: "해동용궁사", course3Start: "부산역", course3End: "태종대", calcBtn: "🚀 최적 길찾기 경로 검색",
         mapInstructionBanner: "💡 <strong>지도 핑 찍기 꿀팁:</strong> 지도의 임의의 위치를 클릭하시면 [🚩 출발지로 지정] 또는 [🏁 목적지로 지정] 팝업이 나타나 세상 어디든 원하는 좌표를 핀으로 등록할 수 있습니다!",
         routeResultBannerTitle: "📍 인앱 지도 핑 표시: ",
         routeResultBannerDesc: "💡 지도 핀 위치 좌표가 실시간으로 연동되었습니다.",
@@ -2145,7 +2145,7 @@
         routeDesc: "Select origin and destination for transit breakdown and live map route visualizer.",
         startLoc: "🚩 Select Origin (Input or Click Map)",
         endLoc: "🏁 Select Destination (Input or Click Map)",
-        calcBtn: "🚀 Search Best Route",
+        startPlaceholder: "e.g., Sasang Terminal, Busan Station, Gimhae Airport...", endPlaceholder: "e.g., Haeundae Beach, Gwangalli, Gamcheon Village...", startPresets: ["Sasang Terminal", "Busan Station", "Gimhae Airport", "Seomyeon Station", "Haeundae Station"], endPresets: ["Haeundae Beach", "Gwangalli Beach", "Gamcheon Village", "Haedong Yonggungsa", "Jagalchi Market", "Taejongdae"], defaultStartVal: "Sasang Terminal", defaultEndVal: "Haeundae Beach", course1Start: "Busan Station", course1End: "Haeundae Beach", course2Start: "Haeundae Station", course2End: "Haedong Yonggungsa", course3Start: "Busan Station", course3End: "Taejongdae", calcBtn: "🚀 Search Best Route",
         mapInstructionBanner: "💡 <strong>Click-to-Pin Tip:</strong> Click anywhere on the map to set a 🚩 Origin or 🏁 Destination pin freely!",
         routeResultBannerTitle: "📍 Map Route Active: ",
         routeResultBannerDesc: "💡 Coordinates updated in real-time.",
@@ -2226,7 +2226,7 @@
         routeDesc: "选择出发地与目的地，获取最佳交通方案并一键开启地图导航。",
         startLoc: "🚩 选择出发地",
         endLoc: "🏁 选择目的地",
-        calcBtn: "🚀 查询最佳路线",
+        startPlaceholder: "例: 沙上客运站, 釜山站, 金海机场...", endPlaceholder: "例: 海云台海水浴场, 广安里, 甘川文化村...", startPresets: ["沙上客运站", "釜山站", "金海机场", "西面站", "海云台站"], endPresets: ["海云台海水浴场", "广安里海水浴场", "甘川文化村", "海东龙宫寺", "扎嘎其市场", "太宗台"], defaultStartVal: "沙上客运站", defaultEndVal: "海云台海水浴场", course1Start: "釜山站", course1End: "海云台海水浴场", course2Start: "海云台站", course2End: "海东龙宫寺", course3Start: "釜山站", course3End: "太宗台", calcBtn: "🚀 查询最佳路线",
         mapInstructionBanner: "💡 <strong>地图打针提示:</strong> 点击地图任意位置即可自由设置 🚩 出发地 或 🏁 目的地！",
         routeResultBannerTitle: "📍 实时路线展示: ",
         routeResultBannerDesc: "💡 坐标数据实时同步。",
@@ -5617,6 +5617,46 @@
       document.getElementById('guide3Desc').textContent = t.guide3Desc;
 
       document.getElementById('favoritesTitle').textContent = t.favoritesTitle;
+
+      // Multilingual Route Finder Placeholders, Values & Datalists Update
+      if (startCustomInput) {
+        if (t.startPlaceholder) startCustomInput.placeholder = t.startPlaceholder;
+        const defaultStarts = ['沙上ターミナル', '사상터미널', '부산서부버스터미널', 'Sasang Terminal', '沙上客运站', ''];
+        if (defaultStarts.includes(startCustomInput.value.trim())) {
+          if (t.defaultStartVal) startCustomInput.value = t.defaultStartVal;
+        }
+      }
+
+      if (endCustomInput) {
+        if (t.endPlaceholder) endCustomInput.placeholder = t.endPlaceholder;
+        const defaultEnds = ['海雲台海水浴場', '해운대해수욕장', 'Haeundae Beach', '海云台海水浴场', ''];
+        if (defaultEnds.includes(endCustomInput.value.trim())) {
+          if (t.defaultEndVal) endCustomInput.value = t.defaultEndVal;
+        }
+      }
+
+      const startDatalist = document.getElementById('startPresets');
+      if (startDatalist && t.startPresets) {
+        startDatalist.innerHTML = t.startPresets.map(p => `<option value="${p}"></option>`).join('');
+      }
+
+      const endDatalist = document.getElementById('endPresets');
+      if (endDatalist && t.endPresets) {
+        endDatalist.innerHTML = t.endPresets.map(p => `<option value="${p}"></option>`).join('');
+      }
+
+      const course1Card = document.getElementById('course1Card');
+      if (course1Card && t.course1Start && t.course1End) {
+        course1Card.onclick = () => setPresetRoute(t.course1Start, t.course1End);
+      }
+      const course2Card = document.getElementById('course2Card');
+      if (course2Card && t.course2Start && t.course2End) {
+        course2Card.onclick = () => setPresetRoute(t.course2Start, t.course2End);
+      }
+      const course3Card = document.getElementById('course3Card');
+      if (course3Card && t.course3Start && t.course3End) {
+        course3Card.onclick = () => setPresetRoute(t.course3Start, t.course3End);
+      }
     }
 
     // 16 Districts Explorer Render: Clean card layout with accurate spot count computed from dataset
@@ -5915,9 +5955,6 @@
     <div class="nav-external-btns">
       <a href="${googleNavUrl}" target="_blank" class="nav-ext-btn btn-google">
         ${t.googleNavBtn}
-      </a>
-      <a href="${naverNavUrl}" target="_blank" class="nav-ext-btn btn-naver">
-        ${t.externalNavBtn}
       </a>
     </div>
   `;
