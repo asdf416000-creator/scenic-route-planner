@@ -5479,16 +5479,53 @@ function initNativeMap() {
   });
 }
 
+// Naver Geocoding (address/place -> coordinates), with a small cache
+const geocodeCache = {};
+function geocodePlace(text) {
+  return new Promise(resolve => {
+    const query = (text || '').trim();
+    if (!query) return resolve(null);
+    if (geocodeCache[query] !== undefined) return resolve(geocodeCache[query]);
+    if (typeof naver === 'undefined' || !naver.maps || !naver.maps.Service) return resolve(null);
+
+    naver.maps.Service.geocode({ query: query }, (status, response) => {
+      let coord = null;
+      if (
+        status === naver.maps.Service.Status.OK &&
+        response.v2 && response.v2.addresses && response.v2.addresses.length
+      ) {
+        const a = response.v2.addresses[0];
+        coord = [parseFloat(a.y), parseFloat(a.x)];
+      }
+      geocodeCache[query] = coord;
+      resolve(coord);
+    });
+  });
+}
+
+// Resolve a place to coordinates: map pin > preset list > Naver geocoding > approximation
+async function resolvePlaceCoord(text, isStart) {
+  const info = getLocationQuery(text, isStart);
+  if (info.isCoord) return [info.lat, info.lng];
+
+  const geo = await geocodePlace(text);
+  if (geo) return geo;
+
+  return getCoordsForPlace(text, isStart);
+}
+
 // Update Naver Interactive Map Route
-function updateMapRoute(startText, endText) {
+async function updateMapRoute(startText, endText) {
   if (!leafletMap || typeof naver === 'undefined' || !naver.maps) return;
 
   if (startMarker) startMarker.setMap(null);
   if (endMarker) endMarker.setMap(null);
   if (routeLine) routeLine.setMap(null);
 
-  let sCoord = getCoordsForPlace(startText, true);
-  let eCoord = getCoordsForPlace(endText, false);
+  const [sCoord, eCoord] = await Promise.all([
+    resolvePlaceCoord(startText, true),
+    resolvePlaceCoord(endText, false)
+  ]);
 
   const startPos = new naver.maps.LatLng(sCoord[0], sCoord[1]);
   const endPos = new naver.maps.LatLng(eCoord[0], eCoord[1]);
