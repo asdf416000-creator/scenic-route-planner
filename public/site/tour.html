@@ -12,10 +12,8 @@
     href="https://fonts.googleapis.com/css2?family=Song+Myung&family=Black+Han+Sans&family=Gowun+Dodum&family=Noto+Sans+JP:wght@400;700&family=Noto+Sans+KR:wght@400;700&display=swap"
     rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-
-  <!-- Naver Maps API v3 -->
-  <script type="text/javascript"
-    src="https://oapi.map.naver.com/openapi/v3/maps.js?ncpClientId=jhi0o5b2oj&submodules=geocoding"></script>
+  <!-- Leaflet Interactive Map CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <style>
     /* Busan Tourism Portal Design System - Glassmorphic Dark Premium Theme */
 
@@ -1932,6 +1930,10 @@
       Multilingual Support: 日本語 (Default) | 한국어 | English | 中文
     </p>
   </footer>
+
+  <!-- Naver Map API v3 -->
+  <script type="text/javascript"
+    src="https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=sfawv2t2xq&submodules=geocoder"></script>
 
   <script>
 
@@ -5346,34 +5348,14 @@
       updateFavCount();
     });
 
-            // Naver Map Auth Failure Callback Handler
-    window.naver_map_auth_failure = function () {
-      console.error('Naver Maps API Authentication Failed');
-      const container = document.getElementById('leafletMap');
-      if (container) {
-        container.innerHTML = `
-          <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; padding:20px; text-align:center; background:rgba(255, 111, 82, 0.08); border-radius:16px; border:1px dashed #ff6f52; color:#fff;">
-            <p style="font-size:1.1rem; font-weight:700; color:#ff6f52; margin-bottom:8px;">⚠️ 네이버 지도 API 인증 실패 (OpenAPI Auth Failed)</p>
-            <p style="font-size:0.9rem; color:var(--text-sub); max-width:600px; margin-bottom:12px; line-height:1.5;">
-              네이버 클라우드 플랫폼 계정에 결제 수단이 미등록되어 있거나, Client ID가 비활성화 상태입니다.
-            </p>
-            <p style="font-size:0.85rem; color:var(--text-muted);">
-              Client ID: <code style="color:#f0b642; background:rgba(0,0,0,0.3); padding:2px 8px; border-radius:4px;">jhi0o5b2oj</code>
-            </p>
-          </div>
-        `;
-      }
-    };
-
-    let clickPopup = null;
-
-    // Initialize Naver Maps API v3 Interactive Map with Multilingual Click-to-Pin Handler
+    // Initialize Naver Interactive Map with Multilingual Click-to-Pin Handler
     function initNativeMap() {
       const container = document.getElementById('leafletMap');
       if (!container) return;
 
+      // Fallback check if Naver maps script loaded
       if (typeof naver === 'undefined' || !naver.maps) {
-        console.warn('Naver Maps API v3 not loaded');
+        console.warn('Naver Map API not loaded');
         return;
       }
 
@@ -5381,29 +5363,31 @@
         center: new naver.maps.LatLng(35.1500, 129.0800),
         zoom: 11,
         zoomControl: true,
-        zoomControlOptions: { position: naver.maps.Position.TOP_RIGHT }
+        zoomControlOptions: {
+          position: naver.maps.Position.TOP_RIGHT
+        }
       });
 
       naver.maps.Event.addListener(leafletMap, 'click', (e) => {
         const lat = e.coord.lat();
         const lng = e.coord.lng();
-        const t = translations[currentLang] || {};
+        const t = translations[currentLang];
 
         const popupContent = `
-          <div style="text-align:center; padding: 8px; color: #0f172a; font-family: sans-serif;">
-            <p style="margin-bottom:8px; font-weight:700; font-size:0.9rem; color: #0f172a;">${t.mapPinPopupTitle || '📍 지도 선택 위치'}</p>
-            <div style="display:flex; gap:6px; justify-content:center;">
-              <button id="btnPinStart" style="padding:6px 12px; background:#ff6f52; color:#ffffff; border:none; border-radius:15px; font-size:0.8rem; font-weight:700; cursor:pointer;">
-                ${t.mapPinSetStart || '🚩 출발지로 지정'}
-              </button>
-              <button id="btnPinEnd" style="padding:6px 12px; background:#f0b642; color:#000000; border:none; border-radius:15px; font-size:0.8rem; font-weight:700; cursor:pointer;">
-                ${t.mapPinSetEnd || '🏁 목적지로 지정'}
-              </button>
-            </div>
-          </div>
-        `;
+      <div style="text-align:center; padding: 10px; color: #0f172a; font-family: sans-serif;">
+        <p style="margin-bottom:8px; font-weight:700; font-size:0.9rem;">${t.mapPinPopupTitle}</p>
+        <div style="display:flex; gap:6px; justify-content:center;">
+          <button id="btnPinStart" style="padding:6px 12px; background:#ff6f52; color:#000; border:none; border-radius:15px; font-size:0.8rem; font-weight:700; cursor:pointer;">
+            ${t.mapPinSetStart}
+          </button>
+          <button id="btnPinEnd" style="padding:6px 12px; background:#ffb703; color:#000; border:none; border-radius:15px; font-size:0.8rem; font-weight:700; cursor:pointer;">
+            ${t.mapPinSetEnd}
+          </button>
+        </div>
+      </div>
+    `;
 
-        if (clickPopup && clickPopup.close) clickPopup.close();
+        if (clickPopup) clickPopup.close();
 
         clickPopup = new naver.maps.InfoWindow({
           content: popupContent,
@@ -5438,7 +5422,7 @@
               renderRouteResult();
             };
           }
-        }, 50);
+        }, 100);
       });
     }
 
@@ -5477,50 +5461,56 @@
       return getCoordsForPlace(text, isStart);
     }
 
-    // Update Interactive Leaflet Map Route
+    // Update Naver Interactive Map Route
     async function updateMapRoute(startText, endText) {
-      if (!leafletMap || typeof L === 'undefined') return;
+      if (!leafletMap || typeof naver === 'undefined' || !naver.maps) return;
 
-      if (startMarker) leafletMap.removeLayer(startMarker);
-      if (endMarker) leafletMap.removeLayer(endMarker);
-      if (routeLine) routeLine.removeLayer(routeLine);
+      if (startMarker) startMarker.setMap(null);
+      if (endMarker) endMarker.setMap(null);
+      if (routeLine) routeLine.setMap(null);
 
       const [sCoord, eCoord] = await Promise.all([
         resolvePlaceCoord(startText, true),
         resolvePlaceCoord(endText, false)
       ]);
 
-      if (!sCoord || !eCoord) return;
+      const startPos = new naver.maps.LatLng(sCoord[0], sCoord[1]);
+      const endPos = new naver.maps.LatLng(eCoord[0], eCoord[1]);
 
       const startLbl = currentLang === 'ja' ? '出発地' : (currentLang === 'ko' ? '출발지' : 'Origin');
       const endLbl = currentLang === 'ja' ? '目的地' : (currentLang === 'ko' ? '목적지' : 'Destination');
 
-      const redIcon = L.divIcon({
-        html: '<div style="font-size:28px; filter:drop-shadow(0 2px 5px rgba(0,0,0,0.6)); cursor:pointer;">🚩</div>',
-        className: 'custom-map-pin',
-        iconSize: [30, 30],
-        iconAnchor: [15, 15]
+      startMarker = new naver.maps.Marker({
+        position: startPos,
+        map: leafletMap,
+        title: `${startLbl}: ${startText}`,
+        icon: {
+          content: '<div style="font-size:26px; filter:drop-shadow(0 2px 5px rgba(0,0,0,0.6));">🚩</div>',
+          anchor: new naver.maps.Point(15, 15)
+        }
       });
 
-      const goldIcon = L.divIcon({
-        html: '<div style="font-size:28px; filter:drop-shadow(0 2px 5px rgba(0,0,0,0.6)); cursor:pointer;">🏁</div>',
-        className: 'custom-map-pin',
-        iconSize: [30, 30],
-        iconAnchor: [15, 15]
+      endMarker = new naver.maps.Marker({
+        position: endPos,
+        map: leafletMap,
+        title: `${endLbl}: ${endText}`,
+        icon: {
+          content: '<div style="font-size:26px; filter:drop-shadow(0 2px 5px rgba(0,0,0,0.6));">🏁</div>',
+          anchor: new naver.maps.Point(15, 15)
+        }
       });
 
-      startMarker = L.marker([sCoord[0], sCoord[1]], { icon: redIcon, title: `${startLbl}: ${startText}` }).addTo(leafletMap);
-      endMarker = L.marker([eCoord[0], eCoord[1]], { icon: goldIcon, title: `${endLbl}: ${endText}` }).addTo(leafletMap);
+      routeLine = new naver.maps.Polyline({
+        map: leafletMap,
+        path: [startPos, endPos],
+        strokeColor: '#ff6f52',
+        strokeWeight: 5,
+        strokeOpacity: 0.85,
+        strokeStyle: 'dash'
+      });
 
-      routeLine = L.polyline([[sCoord[0], sCoord[1]], [eCoord[0], eCoord[1]]], {
-        color: '#ff6f52',
-        weight: 5,
-        opacity: 0.85,
-        dashArray: '8, 8'
-      }).addTo(leafletMap);
-
-      const bounds = L.latLngBounds([[sCoord[0], sCoord[1]], [eCoord[0], eCoord[1]]]);
-      leafletMap.fitBounds(bounds, { padding: [50, 50] });
+      const bounds = new naver.maps.LatLngBounds(startPos, endPos);
+      leafletMap.fitBounds(bounds, { top: 50, right: 50, bottom: 50, left: 50 });
     }
 
     // Language Switcher Logic
