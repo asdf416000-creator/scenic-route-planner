@@ -5711,7 +5711,8 @@ function renderSpots() {
     const descText = getLangText(spot.desc, currentLang);
     const locText = getLangText(spot.location, currentLang);
     const spotTags = getLangArray(spot.tags, currentLang);
-    const resolvedImg = resolveImgUrl(spot.image);
+    const resolvedImg = resolveImgUrl(spot.image, spot.category);
+    const fallbackImg = fallbackImgUrl(spot.category);
 
     const categoryIcons = {
       ja: { food: '🦪 グルメ・市場', cafe: '☕ カフェ・スイーツ', beach: '🌊 ビーチ', culture: '🏯 観光・文化' },
@@ -5723,7 +5724,7 @@ function renderSpots() {
 
     const imageHeaderHtml = `
       <div class="spot-img-wrap">
-        <img src="${resolvedImg}" alt="${titleText}" class="spot-img" loading="lazy" onerror="this.onerror=null; this.src='https://picsum.photos/seed/busan/600/400';" />
+        <img src="${resolvedImg}" alt="${titleText}" class="spot-img" loading="lazy" onerror="this.onerror=null; this.src='${fallbackImg}';" />
         <button class="spot-fav-btn ${isFav ? 'active' : ''}" data-id="${spot.id}">
           <i class="${isFav ? 'fa-solid' : 'fa-regular'} fa-heart"></i>
         </button>
@@ -5793,7 +5794,7 @@ function renderFavModal() {
   const favSpots = spotsData.filter(s => favorites.includes(s.id));
   favModalBody.innerHTML = favSpots.map(spot => `
     <div style="display:flex; gap:16px; align-items:center; padding:12px; background:rgba(255,255,255,0.05); border-radius:12px; margin-bottom:12px;">
-      <img src="${resolveImgUrl(spot.image)}" style="width:80px; height:60px; object-fit:cover; border-radius:8px;" onerror="this.onerror=null; this.src='https://picsum.photos/seed/busan/600/400';" />
+      <img src="${resolveImgUrl(spot.image, spot.category)}" style="width:80px; height:60px; object-fit:cover; border-radius:8px;" onerror="this.onerror=null; this.src='${fallbackImgUrl(spot.category)}';" />
       <div style="flex:1;">
         <h4 style="font-size:1rem; color:#fff;">${getLangText(spot.title, currentLang)}</h4>
         <p style="font-size:0.8rem; color:var(--text-sub);">${getLangText(spot.location, currentLang)}</p>
