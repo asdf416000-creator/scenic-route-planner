@@ -792,7 +792,9 @@
       border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     }
 
-    .nav-brand {
+    .nav-brand,
+    .nav-brand:hover,
+    .nav-brand:focus {
       display: flex;
       align-items: center;
       gap: 12px;
@@ -802,6 +804,7 @@
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       cursor: pointer;
+      text-decoration: none;
     }
 
     .brand-badge {
@@ -920,30 +923,6 @@
 
     .fav-trigger-btn:hover {
       background: rgba(239, 68, 68, 0.25);
-      transform: translateY(-2px);
-    }
-
-    /* Back to Main Landing Button */
-    .btn-back-main {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      padding: 8px 16px;
-      background: rgba(255, 111, 82, 0.15);
-      border: 1px solid var(--border-glow);
-      border-radius: 30px;
-      color: var(--accent-coral);
-      font-size: 0.9rem;
-      font-weight: 700;
-      text-decoration: none;
-      transition: all 0.2s ease;
-      white-space: nowrap;
-    }
-
-    .btn-back-main:hover {
-      background: var(--accent-coral);
-      color: #000;
-      box-shadow: 0 4px 15px rgba(255, 111, 82, 0.4);
       transform: translateY(-2px);
     }
 
@@ -1701,10 +1680,10 @@
 
   <!-- Navigation Bar -->
   <nav class="navbar">
-    <a href="index.html" class="nav-brand" id="brandLogo" title="메인 페이지로 이동">
+    <div class="nav-brand" id="brandLogo">
       <span class="brand-badge">Busan is Good</span>
       <span id="txtBrandTitle">釜山観光ガイド</span>
-    </a>
+    </div>
     <ul class="nav-links">
       <li><a href="index.html" id="navIndexLink">🏠 <span id="txtNavIndex">메인으로</span></a></li>
       <li><a href="#hero" id="navHomeLink" class="active">ホーム</a></li>
@@ -1714,10 +1693,6 @@
       <li><a href="#transit" id="navTransitLink">交通ガイド</a></li>
     </ul>
     <div class="nav-actions">
-      <!-- Back to Main Page Button -->
-      <a href="index.html" class="btn-back-main" id="btnBackToMain">
-        🏠 <span id="txtBtnBackToMain">메인으로</span>
-      </a>
       <!-- Language Selector -->
       <div class="lang-selector">
         <button class="lang-btn" id="langBtn">
@@ -1749,9 +1724,6 @@
         海雲台の青い海から甘川文化村の彩り豊かな路地まで、釜山16区の隠れた魅力を多言語で案内します。
       </p>
       <div class="hero-btns">
-        <a href="index.html" class="btn-secondary" id="btnHeroBackMain"
-          style="border-color: var(--border-glow); color: var(--accent-coral);">🏠 <span id="txtHeroBackMain">메인
-            페이지</span></a>
         <a href="#route" class="btn-primary" id="btnExploreRoute">🧭 リアルタイム地図ナビ</a>
         <a href="#districts" class="btn-secondary" id="btnExploreMap">🗺️ 16区マップで探す</a>
       </div>
@@ -1958,12 +1930,6 @@
   <!-- Footer -->
   <footer>
     <p>© 2026 Busan Tourism Guide — Busan is Good. All rights reserved.</p>
-    <p style="margin-top: 8px;">
-      <a href="index.html"
-        style="color: var(--accent-coral); text-decoration: none; font-weight: 700; font-size: 0.95rem;">
-        <span id="txtFooterBackMain">메인 페이지(index.html)로 돌아가기</span>
-      </a>
-    </p>
     <p style="margin-top: 6px; font-size: 0.8rem; color: var(--text-muted);">
       Multilingual Support: 日本語 (Default) | 한국어 | English | 中文
     </p>
