@@ -923,6 +923,30 @@
       transform: translateY(-2px);
     }
 
+    /* Back to Main Landing Button */
+    .btn-back-main {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      background: rgba(255, 111, 82, 0.15);
+      border: 1px solid var(--border-glow);
+      border-radius: 30px;
+      color: var(--accent-coral);
+      font-size: 0.9rem;
+      font-weight: 700;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+
+    .btn-back-main:hover {
+      background: var(--accent-coral);
+      color: #000;
+      box-shadow: 0 4px 15px rgba(255, 111, 82, 0.4);
+      transform: translateY(-2px);
+    }
+
     /* Hero Section */
     .hero {
       position: relative;
@@ -1677,11 +1701,12 @@
 
   <!-- Navigation Bar -->
   <nav class="navbar">
-    <div class="nav-brand" id="brandLogo">
+    <a href="index.html" class="nav-brand" id="brandLogo" title="메인 페이지로 이동">
       <span class="brand-badge">Busan is Good</span>
       <span id="txtBrandTitle">釜山観光ガイド</span>
-    </div>
+    </a>
     <ul class="nav-links">
+      <li><a href="index.html" id="navIndexLink">🏠 <span id="txtNavIndex">메인으로</span></a></li>
       <li><a href="#hero" id="navHomeLink" class="active">ホーム</a></li>
       <li><a href="#districts" id="navDistrictsLink">16区マップ</a></li>
       <li><a href="#spots" id="navAttractionsLink">名所 & 美食</a></li>
@@ -1689,6 +1714,10 @@
       <li><a href="#transit" id="navTransitLink">交通ガイド</a></li>
     </ul>
     <div class="nav-actions">
+      <!-- Back to Main Page Button -->
+      <a href="index.html" class="btn-back-main" id="btnBackToMain">
+        🏠 <span id="txtBtnBackToMain">메인으로</span>
+      </a>
       <!-- Language Selector -->
       <div class="lang-selector">
         <button class="lang-btn" id="langBtn">
@@ -1720,6 +1749,7 @@
         海雲台の青い海から甘川文化村の彩り豊かな路地まで、釜山16区の隠れた魅力を多言語で案内します。
       </p>
       <div class="hero-btns">
+        <a href="index.html" class="btn-secondary" id="btnHeroBackMain" style="border-color: var(--border-glow); color: var(--accent-coral);">🏠 <span id="txtHeroBackMain">메인 페이지</span></a>
         <a href="#route" class="btn-primary" id="btnExploreRoute">🧭 リアルタイム地図ナビ</a>
         <a href="#districts" class="btn-secondary" id="btnExploreMap">🗺️ 16区マップで探す</a>
       </div>
@@ -1926,6 +1956,11 @@
   <!-- Footer -->
   <footer>
     <p>© 2026 Busan Tourism Guide — Busan is Good. All rights reserved.</p>
+    <p style="margin-top: 8px;">
+      <a href="index.html" style="color: var(--accent-coral); text-decoration: none; font-weight: 700; font-size: 0.95rem;">
+        🏠 <span id="txtFooterBackMain">메인 페이지(index.html)로 돌아가기</span>
+      </a>
+    </p>
     <p style="margin-top: 6px; font-size: 0.8rem; color: var(--text-muted);">
       Multilingual Support: 日本語 (Default) | 한국어 | English | 中文
     </p>
@@ -1942,6 +1977,10 @@
     const translations = {
       ja: {
         siteTitle: "釜山観光ガイド | Busan is Good",
+        navIndex: "メインへ",
+        btnBackMain: "メインへ",
+        heroBackMain: "🏠 メインページへ",
+        footerBackMain: "🏠 メインページ (index.html) へ戻る",
         navHome: "ホーム",
         navDistricts: "16区マップ",
         navAttractions: "名所 & 美食",
@@ -2023,6 +2062,10 @@
       },
       ko: {
         siteTitle: "부산 관광 가이드 | Busan is Good",
+        navIndex: "메인으로",
+        btnBackMain: "메인으로",
+        heroBackMain: "🏠 메인 페이지로",
+        footerBackMain: "🏠 메인 페이지(index.html)로 돌아가기",
         navHome: "홈",
         navDistricts: "16개 구 지도",
         navAttractions: "명소 & 맛집",
@@ -2104,6 +2147,10 @@
       },
       en: {
         siteTitle: "Busan Travel Guide | Busan is Good",
+        navIndex: "Main",
+        btnBackMain: "Main Page",
+        heroBackMain: "🏠 Main Page",
+        footerBackMain: "🏠 Return to Main Page (index.html)",
         navHome: "Home",
         navDistricts: "16 Districts Map",
         navAttractions: "Attractions & Food",
@@ -2185,6 +2232,10 @@
       },
       zh: {
         siteTitle: "釜山旅游指南 | Busan is Good",
+        navIndex: "首页",
+        btnBackMain: "返回首页",
+        heroBackMain: "🏠 返回首页",
+        footerBackMain: "🏠 返回首页 (index.html)",
         navHome: "首页",
         navDistricts: "16区地图",
         navAttractions: "景点与美食",
@@ -5551,6 +5602,10 @@
       currentLangLabel.textContent = langLabels[lang] || '日本語 (JP)';
 
       document.getElementById('txtBrandTitle').textContent = t.siteTitle.split('|')[0].trim();
+      if (document.getElementById('txtNavIndex')) document.getElementById('txtNavIndex').textContent = t.navIndex;
+      if (document.getElementById('txtBtnBackToMain')) document.getElementById('txtBtnBackToMain').textContent = t.btnBackMain;
+      if (document.getElementById('txtHeroBackMain')) document.getElementById('txtHeroBackMain').textContent = t.heroBackMain;
+      if (document.getElementById('txtFooterBackMain')) document.getElementById('txtFooterBackMain').textContent = t.footerBackMain;
       document.getElementById('navHomeLink').textContent = t.navHome;
       document.getElementById('navDistrictsLink').textContent = t.navDistricts;
       document.getElementById('navAttractionsLink').textContent = t.navAttractions;
