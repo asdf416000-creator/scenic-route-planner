@@ -1950,6 +1950,20 @@
 
   <script>
 
+    // Helper function for multilingual text resolution
+    function getLangText(obj, lang) {
+      if (!obj) return '';
+      if (typeof obj === 'string') return obj;
+      return obj[lang] || obj['ko'] || obj['ja'] || obj['en'] || obj['zh'] || '';
+    }
+
+    // Helper function for multilingual array resolution
+    function getLangArray(obj, lang) {
+      if (!obj) return [];
+      if (Array.isArray(obj)) return obj;
+      return obj[lang] || obj['ko'] || obj['ja'] || obj['en'] || obj['zh'] || [];
+    }
+
     // Busan Tourism Portal Dataset with Multilingual Support (Default: Japanese)
 
     const translations = {
@@ -8256,6 +8270,17 @@
       }
     ];
 
+    
+    function fallbackImgUrl(category) {
+      const fallbacks = {
+        beach: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="600" height="400" viewBox="0 0 600 400"><rect width="600" height="400" fill="%230f172a"/><path d="M0,250 Q150,200 300,250 T600,250 L600,400 L0,400 Z" fill="%231e3a8a"/><text x="50%" y="45%" fill="%2360a5fa" font-size="28" font-family="sans-serif" text-anchor="middle" font-weight="bold">🌊 Busan Ocean</text></svg>',
+        cafe: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="600" height="400" viewBox="0 0 600 400"><rect width="600" height="400" fill="%2318181b"/><text x="50%" y="45%" fill="%23fbbf24" font-size="28" font-family="sans-serif" text-anchor="middle" font-weight="bold">☕ Busan Cafe & Dessert</text></svg>',
+        food: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="600" height="400" viewBox="0 0 600 400"><rect width="600" height="400" fill="%231f1917"/><text x="50%" y="45%" fill="%23f97316" font-size="28" font-family="sans-serif" text-anchor="middle" font-weight="bold">🦪 Busan Gourmet Food</text></svg>',
+        culture: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="600" height="400" viewBox="0 0 600 400"><rect width="600" height="400" fill="%23141c2e"/><text x="50%" y="45%" fill="%23a7f3d0" font-size="28" font-family="sans-serif" text-anchor="middle" font-weight="bold">🏛️ Busan Culture & Spot</text></svg>'
+      };
+      return fallbacks[category] || fallbacks.culture;
+    }
+
     function resolveImgUrl(imgPath, category) {
       if (!imgPath) return fallbackImgUrl(category);
       if (imgPath.startsWith('http://') || imgPath.startsWith('https://')) return imgPath;
@@ -8848,7 +8873,7 @@
       if (startCustomInput) {
         if (t.startPlaceholder) startCustomInput.placeholder = t.startPlaceholder;
         const defaultStarts = ['沙上ターミナル', '사상터미널', '부산서부버스터미널', 'Sasang Terminal', '沙上客运站', ''];
-        if (defaultStarts.includes(startCustomInput.value.trim())) {
+        if (defaultStarts.includes((startCustomInput && startCustomInput.value ? startCustomInput.value.trim() : ''))) {
           if (t.defaultStartVal) startCustomInput.value = t.defaultStartVal;
         }
       }
@@ -8856,7 +8881,7 @@
       if (endCustomInput) {
         if (t.endPlaceholder) endCustomInput.placeholder = t.endPlaceholder;
         const defaultEnds = ['海雲台海水浴場', '해운대해수욕장', 'Haeundae Beach', '海云台海水浴场', ''];
-        if (defaultEnds.includes(endCustomInput.value.trim())) {
+        if (defaultEnds.includes((endCustomInput && endCustomInput.value ? endCustomInput.value.trim() : ''))) {
           if (t.defaultEndVal) endCustomInput.value = t.defaultEndVal;
         }
       }
@@ -9052,6 +9077,31 @@
       }
     }
 
+    
+    // Favorites Helper Functions
+    function updateFavCount() {
+      const favCount = document.getElementById('favCount');
+      if (favCount) {
+        favCount.textContent = favorites.length;
+      }
+    }
+
+    function toggleFavorite(spotId) {
+      const idx = favorites.indexOf(spotId);
+      if (idx > -1) {
+        favorites.splice(idx, 1);
+      } else {
+        favorites.push(spotId);
+      }
+      localStorage.setItem('busan_favs', JSON.stringify(favorites));
+      updateFavCount();
+      renderSpots();
+      const favModal = document.getElementById('favModal');
+      if (favModal && favModal.classList.contains('show')) {
+        renderFavModal();
+      }
+    }
+
     function renderFavModal() {
       if (favorites.length === 0) {
         favModalBody.innerHTML = `
@@ -9137,8 +9187,8 @@
       const defaultStart = currentLang === 'ja' ? '沙上ターミナル' : (currentLang === 'ko' ? '부산서부버스터미널' : 'Sasang');
       const defaultEnd = currentLang === 'ja' ? '海雲台海水浴場' : (currentLang === 'ko' ? '해운대해수욕장' : 'Haeundae Beach');
 
-      const startText = (startCustomInput ? startCustomInput.value.trim() : '') || defaultStart;
-      const endText = (endCustomInput ? endCustomInput.value.trim() : '') || defaultEnd;
+      const startText = (startCustomInput ? (startCustomInput && startCustomInput.value ? startCustomInput.value.trim() : '') : '') || defaultStart;
+      const endText = (endCustomInput ? (endCustomInput && endCustomInput.value ? endCustomInput.value.trim() : '') : '') || defaultEnd;
 
       const t = translations[currentLang];
 
