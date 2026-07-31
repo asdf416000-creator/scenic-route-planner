@@ -803,7 +803,7 @@
       background: linear-gradient(135deg, #ffffff 0%, var(--accent-coral) 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      cursor: pointer;
+      cursor: default;
       text-decoration: none;
     }
 
@@ -5201,35 +5201,26 @@
       return './images/' + encodeURIComponent(cleanName);
     }
 
-    // Preset Coordinates with Multilingual Place Aliases
+    // Preset Coordinates with Multilingual & Variant Place Aliases (Expanded GPS Database)
     const placeCoords = {
-      "부산서부버스터미널": [35.1631, 128.9862],
-      "사상": [35.1631, 128.9862],
-      "沙上ターミナル": [35.1631, 128.9862],
-      "沙上": [35.1631, 128.9862],
-      "Sasang": [35.1631, 128.9862],
+      // Water Parks & Theme Parks
+      "롯데워터파크": [35.1788, 128.8286],
+      "김해롯데워터파크": [35.1788, 128.8286],
+      "롯데워터파크김해": [35.1788, 128.8286],
+      "Lotte Water Park": [35.1788, 128.8286],
+      "김해워터파크": [35.1788, 128.8286],
 
-      "부산역": [35.1152, 129.0422],
-      "釜山駅": [35.1152, 129.0422],
-      "Busan Station": [35.1152, 129.0422],
+      "롯데월드": [35.1960, 129.2133],
+      "롯데월드어드벤처부산": [35.1960, 129.2133],
+      "부산롯데월드": [35.1960, 129.2133],
+      "기장롯데월드": [35.1960, 129.2133],
+      "Lotte World Busan": [35.1960, 129.2133],
 
-      "김해국제공항": [35.1795, 128.9382],
-      "김해공항": [35.1795, 128.9382],
-      "金海国際空港": [35.1795, 128.9382],
-      "金海空港": [35.1795, 128.9382],
-      "Gimhae Airport": [35.1795, 128.9382],
-
-      "서면역": [35.1578, 129.0592],
-      "서면": [35.1578, 129.0592],
-      "西面駅": [35.1578, 129.0592],
-      "西面": [35.1578, 129.0592],
-      "Seomyeon": [35.1578, 129.0592],
-
+      // Major Beaches
       "해운대해수욕장": [35.1587, 129.1604],
-      "해운대역": [35.1638, 129.1584],
       "해운대": [35.1587, 129.1604],
+      "해운대역": [35.1638, 129.1584],
       "海雲台海水浴場": [35.1587, 129.1604],
-      "海雲台駅": [35.1638, 129.1584],
       "海雲台": [35.1587, 129.1604],
       "Haeundae Beach": [35.1587, 129.1604],
 
@@ -5239,11 +5230,27 @@
       "広安里": [35.1532, 129.1189],
       "Gwangalli Beach": [35.1532, 129.1189],
 
+      "송도해수욕장": [35.0756, 129.0169],
+      "송도해상케이블카": [35.0762, 129.0235],
+      "송도용궁구름다리": [35.0694, 129.0205],
+
+      "다대포해수욕장": [35.0472, 128.9664],
+      "다대포": [35.0472, 128.9664],
+      "꿈의낙조분수": [35.0468, 128.9660],
+
+      "송정해수욕장": [35.1786, 129.1997],
+      "송정": [35.1786, 129.1997],
+      "일광해수욕장": [35.2605, 129.2334],
+      "임랑해수욕장": [35.3188, 129.2642],
+
+      // Cultural & Tourist Landmarks
       "감천문화마을": [35.0975, 129.0106],
+      "감천마을": [35.0975, 129.0106],
       "甘川文化村": [35.0975, 129.0106],
       "Gamcheon Village": [35.0975, 129.0106],
 
       "해동용궁사": [35.1884, 129.2233],
+      "용궁사": [35.1884, 129.2233],
       "海東龍宮寺": [35.1884, 129.2233],
       "Haedong Yonggungsa": [35.1884, 129.2233],
 
@@ -5253,9 +5260,78 @@
       "Jagalchi Market": [35.0967, 129.0306],
 
       "태종대": [35.0533, 129.0872],
+      "태종대유원지": [35.0533, 129.0872],
       "太宗台": [35.0533, 129.0872],
-      "Taejongdae": [35.0533, 129.0872]
+      "Taejongdae": [35.0533, 129.0872],
+
+      "흰여울문화마을": [35.0784, 129.0456],
+      "흰여울마을": [35.0784, 129.0456],
+      "용두산공원": [35.1006, 129.0326],
+      "부산타워": [35.1006, 129.0326],
+
+      "국제시장": [35.1009, 129.0289],
+      "부평깡통시장": [35.1018, 129.0264],
+      "초량이바구길": [35.1172, 129.0375],
+      "168계단": [35.1172, 129.0375],
+
+      "청사포": [35.1610, 129.1915],
+      "청사포다릿돌전망대": [35.1625, 129.1932],
+      "엑스더스카이": [35.1598, 129.1678],
+      "해운대엑스더스카이": [35.1598, 129.1678],
+      "해운대블루라인파크": [35.1601, 129.1685],
+      "미포철길": [35.1601, 129.1685],
+
+      "오시리아관광단지": [35.1915, 129.2155],
+      "동부산이케아": [35.1925, 129.2120],
+      "범어사": [35.2838, 129.0688],
+      "밀락더마켓": [35.1548, 129.1275],
+      "F1963": [35.1768, 129.1152],
+
+      "삼락생태공원": [35.1685, 128.9740],
+      "화명생태공원": [35.2340, 129.0062],
+      "맥도생태공원": [35.1320, 128.9430],
+      "을숙도": [35.1070, 128.9440],
+
+      // Transit Hubs & Centers
+      "부산역": [35.1152, 129.0422],
+      "釜山駅": [35.1152, 129.0422],
+      "Busan Station": [35.1152, 129.0422],
+
+      "김해국제공항": [35.1795, 128.9382],
+      "김해공항": [35.1795, 128.9382],
+      "金海国際空港": [35.1795, 128.9382],
+      "Gimhae Airport": [35.1795, 128.9382],
+
+      "부산서부버스터미널": [35.1631, 128.9862],
+      "사상터미널": [35.1631, 128.9862],
+      "사상역": [35.1631, 128.9862],
+      "사상": [35.1631, 128.9862],
+      "沙上ターミナル": [35.1631, 128.9862],
+      "Sasang": [35.1631, 128.9862],
+
+      "부산종합버스터미널": [35.2847, 129.0954],
+      "노포동터미널": [35.2847, 129.0954],
+      "노포역": [35.2847, 129.0954],
+
+      "서면역": [35.1578, 129.0592],
+      "서면": [35.1578, 129.0592],
+      "西面駅": [35.1578, 129.0592],
+      "Seomyeon": [35.1578, 129.0592],
+
+      "남포동": [35.0979, 129.0348],
+      "남포역": [35.0979, 129.0348],
+
+      "센텀시티": [35.1689, 129.1316],
+      "신세계센텀시티": [35.1689, 129.1316],
+      "벡스코": [35.1691, 129.1362],
+      "BEXCO": [35.1691, 129.1362]
     };
+
+    // Space-insensitive string normalizer for robust search matching
+    function normalizePlaceKey(str) {
+      if (!str) return '';
+      return str.toString().replace(/[\s\-\_\.\,\(\)\[\]]/g, '').toLowerCase();
+    }
 
     // Extract coordinates or clean text query for map APIs
     function getLocationQuery(text, isStart) {
@@ -5274,31 +5350,51 @@
       }
 
       const clean = text.trim();
-      if (placeCoords[clean]) {
-        return { isCoord: true, lat: placeCoords[clean][0], lng: placeCoords[clean][1], text: clean };
+      const norm = normalizePlaceKey(clean);
+
+      for (const [key, coord] of Object.entries(placeCoords)) {
+        if (normalizePlaceKey(key) === norm) {
+          return { isCoord: true, lat: coord[0], lng: coord[1], text: clean };
+        }
       }
 
       return { isCoord: false, text: clean };
     }
 
-    // Generate fallback coords for unlisted places
+    // Generate fallback coords for unlisted places with normalized fuzzy matching
     function getCoordsForPlace(placeText, isStart) {
       const info = getLocationQuery(placeText, isStart);
       if (info.isCoord) return [info.lat, info.lng];
 
-      const normalized = placeText.trim();
+      const clean = placeText.trim();
+      const norm = normalizePlaceKey(clean);
+
+      // 1. Normalized fuzzy substring check in placeCoords
       for (const [key, coord] of Object.entries(placeCoords)) {
-        if (normalized.includes(key) || key.includes(normalized)) {
+        const normKey = normalizePlaceKey(key);
+        if (norm.includes(normKey) || normKey.includes(norm)) {
           return coord;
         }
       }
 
-      let hash = 0;
-      for (let i = 0; i < normalized.length; i++) hash = normalized.charCodeAt(i) + ((hash << 5) - hash);
-      const latOffset = ((Math.abs(hash) % 100) / 1000) - 0.05;
-      const lngOffset = (((Math.abs(hash) >> 2) % 100) / 1000) - 0.05;
+      // 2. Search spotsData for matching spot title
+      if (typeof spotsData !== 'undefined' && Array.isArray(spotsData)) {
+        for (const spot of spotsData) {
+          const koTitle = normalizePlaceKey(getLangText(spot.title, 'ko'));
+          const jaTitle = normalizePlaceKey(getLangText(spot.title, 'ja'));
+          const enTitle = normalizePlaceKey(getLangText(spot.title, 'en'));
+          if ((koTitle && (norm.includes(koTitle) || koTitle.includes(norm))) ||
+              (jaTitle && (norm.includes(jaTitle) || jaTitle.includes(norm))) ||
+              (enTitle && (norm.includes(enTitle) || enTitle.includes(norm)))) {
+            for (const [key, coord] of Object.entries(placeCoords)) {
+              if (normalizePlaceKey(key) === koTitle) return coord;
+            }
+          }
+        }
+      }
 
-      return isStart ? [35.1600 + latOffset, 129.0000 + lngOffset] : [35.1600 + latOffset, 129.1200 + lngOffset];
+      // Default realistic center coordinates for Busan/Gyeongnam
+      return isStart ? [35.1600, 128.9900] : [35.1600, 129.1300];
     }
 
     // Application State Variables
@@ -5446,7 +5542,7 @@
       });
     }
 
-    // Naver Geocoding (address/place -> coordinates), with a small cache
+    // Naver Geocoding (address/place -> coordinates), with a small cache and auto-prefix retry
     const geocodeCache = {};
     function geocodePlace(text) {
       return new Promise(resolve => {
@@ -5456,16 +5552,30 @@
         if (typeof naver === 'undefined' || !naver.maps || !naver.maps.Service) return resolve(null);
 
         naver.maps.Service.geocode({ query: query }, (status, response) => {
-          let coord = null;
           if (
             status === naver.maps.Service.Status.OK &&
             response.v2 && response.v2.addresses && response.v2.addresses.length
           ) {
             const a = response.v2.addresses[0];
-            coord = [parseFloat(a.y), parseFloat(a.x)];
+            const coord = [parseFloat(a.y), parseFloat(a.x)];
+            geocodeCache[query] = coord;
+            return resolve(coord);
           }
-          geocodeCache[query] = coord;
-          resolve(coord);
+
+          // Retry with regional prefix if query didn't specify region
+          const retryQuery = (query.includes('부산') || query.includes('김해')) ? query : ('부산 ' + query);
+          naver.maps.Service.geocode({ query: retryQuery }, (status2, response2) => {
+            let coord2 = null;
+            if (
+              status2 === naver.maps.Service.Status.OK &&
+              response2.v2 && response2.v2.addresses && response2.v2.addresses.length
+            ) {
+              const a2 = response2.v2.addresses[0];
+              coord2 = [parseFloat(a2.y), parseFloat(a2.x)];
+            }
+            geocodeCache[query] = coord2;
+            resolve(coord2);
+          });
         });
       });
     }
