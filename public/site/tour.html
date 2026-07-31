@@ -8601,10 +8601,10 @@
       const eInfo = getLocationQuery(endText, false);
 
       const buildNaverTransitUrl = (sLat, sLng, sName, eLat, eLng, eName) =>
-        `https://m.map.naver.com/route/public.naver?slat=${sLat}&slng=${sLng}&sname=${encodeURIComponent(sName)}&elat=${eLat}&elng=${eLng}&ename=${encodeURIComponent(eName)}`;
+        `https://map.naver.com/v5/directions/${sLng},${sLat},${encodeURIComponent(sName)}/${eLng},${eLat},${encodeURIComponent(eName)}/-/transit?c=${sLng},${sLat},13,0,0,0,dh`;
 
       const buildNaverTaxiUrl = (sLat, sLng, sName, eLat, eLng, eName) =>
-        `https://m.map.naver.com/route/car.naver?slat=${sLat}&slng=${sLng}&sname=${encodeURIComponent(sName)}&elat=${eLat}&elng=${eLng}&ename=${encodeURIComponent(eName)}`;
+        `https://map.naver.com/v5/directions/${sLng},${sLat},${encodeURIComponent(sName)}/${eLng},${eLat},${encodeURIComponent(eName)}/-/car?c=${sLng},${sLat},13,0,0,0,dh`;
 
       const sFallback = sInfo.isCoord ? [sInfo.lat, sInfo.lng] : getCoordsForPlace(startText, true);
       const eFallback = eInfo.isCoord ? [eInfo.lat, eInfo.lng] : getCoordsForPlace(endText, false);
