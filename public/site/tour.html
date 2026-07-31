@@ -1781,27 +1781,36 @@
     <div class="section-header">
       <h2 class="section-title" id="spotsTitle">✨ 釜山おすすめ観光スポット & グルメ</h2>
       <p class="section-subtitle" id="spotsDesc">カテゴリーや検索機能を利用して、あなたにぴったりの旅行先を見つけましょう。</p>
+      <button type="button" class="btn-toggle-spots" id="btnToggleSpots"
+        style="display: inline-flex; align-items: center; gap: 8px; margin-top: 14px; padding: 9px 20px; background: linear-gradient(135deg, rgba(255,255,255,0.12), rgba(255,255,255,0.05)); border: 1px solid rgba(255, 255, 255, 0.25); border-radius: 25px; color: #ffffff; font-size: 0.93rem; font-weight: 700; cursor: pointer; backdrop-filter: blur(10px); transition: all 0.3s ease; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+        <span id="toggleSpotsText">명소 목록 접기</span>
+        <i class="fa-solid fa-chevron-up" id="toggleSpotsIcon"></i>
+      </button>
     </div>
 
-    <div class="controls-bar">
-      <div class="search-box">
-        <i class="fa-solid fa-magnifying-glass search-icon"></i>
-        <input type="text" class="search-input" id="searchInput" placeholder="スポット名、エリア名、キーワードで検索..." />
+    <div id="spotsContentWrapper" class="spots-container"
+      style="transition: max-height 0.45s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.35s ease; overflow: hidden; max-height: 20000px;">
+      <div class="controls-bar">
+        <div class="search-box">
+          <i class="fa-solid fa-magnifying-glass search-icon"></i>
+          <input type="text" class="search-input" id="searchInput" placeholder="スポット名、エリア名、キーワードで検索..." />
+        </div>
+        <div class="category-tabs" id="categoryTabs">
+          <button class="cat-tab active" data-cat="all" id="catAll">すべて</button>
+          <button class="cat-tab" data-cat="beach" id="catBeach">🏖️ ビーチ・景勝地</button>
+          <button class="cat-tab" data-cat="culture" id="catCulture">🎨 文化・歴史</button>
+          <button class="cat-tab" data-cat="food" id="catFood">🦪 グルメ・市場</button>
+          <button class="cat-tab" data-cat="cafe" id="catCafe">☕ カフェ・夜景</button>
+        </div>
       </div>
-      <div class="category-tabs" id="categoryTabs">
-        <button class="cat-tab active" data-cat="all" id="catAll">すべて</button>
-        <button class="cat-tab" data-cat="beach" id="catBeach">🏖️ ビーチ・景勝地</button>
-        <button class="cat-tab" data-cat="culture" id="catCulture">🎨 文化・歴史</button>
-        <button class="cat-tab" data-cat="food" id="catFood">🦪 グルメ・市場</button>
-        <button class="cat-tab" data-cat="cafe" id="catCafe">☕ カフェ・夜景</button>
+
+      <div id="filterPrompt"
+        style="margin-bottom: 20px; font-size: 0.95rem; color: var(--accent-coral); display: none;">
       </div>
-    </div>
 
-    <div id="filterPrompt" style="margin-bottom: 20px; font-size: 0.95rem; color: var(--accent-coral); display: none;">
-    </div>
-
-    <div class="spots-grid" id="spotsGrid">
-      <!-- Injected via JavaScript -->
+      <div class="spots-grid" id="spotsGrid">
+        <!-- Injected via JavaScript -->
+      </div>
     </div>
   </section>
 
@@ -5398,6 +5407,8 @@
     }
 
     // Application State Variables
+    let isSpotsCollapsed = false;
+    let spotsDisplayLimit = 12;
     let currentLang = localStorage.getItem('busan_lang') || 'ko';
     let selectedDistrict = null;
     let selectedCategory = 'all';
@@ -5454,6 +5465,34 @@
 
     // Initialize Application
     document.addEventListener('DOMContentLoaded', () => {
+      const btnToggleSpots = document.getElementById('btnToggleSpots');
+      const toggleSpotsText = document.getElementById('toggleSpotsText');
+      const toggleSpotsIcon = document.getElementById('toggleSpotsIcon');
+      const spotsContentWrapper = document.getElementById('spotsContentWrapper');
+
+      if (btnToggleSpots && spotsContentWrapper) {
+        btnToggleSpots.addEventListener('click', function () {
+          isSpotsCollapsed = !isSpotsCollapsed;
+          const t = translations[currentLang] || translations.ko;
+
+          if (isSpotsCollapsed) {
+            spotsContentWrapper.style.maxHeight = '0px';
+            spotsContentWrapper.style.opacity = '0';
+            spotsContentWrapper.style.pointerEvents = 'none';
+            spotsContentWrapper.style.marginTop = '0px';
+            if (toggleSpotsText) toggleSpotsText.textContent = t.toggleSpotsExpand || (currentLang === 'ja' ? 'スポット一覧を展開' : (currentLang === 'ko' ? '명소 목록 펼치기' : 'Expand Spot List'));
+            if (toggleSpotsIcon) toggleSpotsIcon.className = 'fa-solid fa-chevron-down';
+          } else {
+            spotsContentWrapper.style.maxHeight = '20000px';
+            spotsContentWrapper.style.opacity = '1';
+            spotsContentWrapper.style.pointerEvents = 'auto';
+            spotsContentWrapper.style.marginTop = '';
+            if (toggleSpotsText) toggleSpotsText.textContent = t.toggleSpotsCollapse || (currentLang === 'ja' ? 'スポット一覧を折りたたむ' : (currentLang === 'ko' ? '명소 목록 접기' : 'Collapse Spot List'));
+            if (toggleSpotsIcon) toggleSpotsIcon.className = 'fa-solid fa-chevron-up';
+          }
+        });
+      }
+
       setupLanguageSelector();
       setupEventListeners();
       applyLanguage(currentLang);
@@ -5854,13 +5893,18 @@
       if (filtered.length === 0) {
         spotsGrid.innerHTML = `
       <div style="grid-column: 1/-1; text-align:center; padding: 60px; color: var(--text-muted);">
-        🔍 Spot not found matching criteria.
+        🔍 검색 조건에 맞는 명소가 없습니다.
       </div>
     `;
         return;
       }
 
-      filtered.forEach(spot => {
+      const isSearching = searchQuery.trim() !== '';
+      const visibleSpots = (isSearching || !spotsDisplayLimit || spotsDisplayLimit >= filtered.length)
+        ? filtered
+        : filtered.slice(0, spotsDisplayLimit);
+
+      visibleSpots.forEach(spot => {
         const isFav = favorites.includes(spot.id);
         const card = document.createElement('div');
         card.className = 'spot-card';
@@ -5890,6 +5934,8 @@
       </div>
     `;
 
+        const mapBtnLabel = (translations[currentLang] && translations[currentLang].detailViewMap) || '🧭 네이버 지도 길찾기';
+
         card.innerHTML = `
       ${imageHeaderHtml}
       <div class="spot-content">
@@ -5904,7 +5950,7 @@
         </div>
         <div class="spot-actions">
           <a href="${spot.naverMapUrl}" target="_blank" class="map-link-btn">
-            ${translations[currentLang].detailViewMap}
+            ${mapBtnLabel}
           </a>
         </div>
       </div>
@@ -5918,25 +5964,39 @@
 
         spotsGrid.appendChild(card);
       });
-    }
 
-    // Favorites Storage & Modal
-    function toggleFavorite(id) {
-      if (favorites.includes(id)) {
-        favorites = favorites.filter(x => x !== id);
-      } else {
-        favorites.push(id);
-      }
-      localStorage.setItem('busan_favs', JSON.stringify(favorites));
-      updateFavCount();
-      renderSpots();
-      if (favModal.classList.contains('show')) {
-        renderFavModal();
-      }
-    }
+      // Load More / Show Less bar at bottom of grid
+      if (!isSearching && filtered.length > 12) {
+        const loadMoreContainer = document.createElement('div');
+        loadMoreContainer.id = 'spotsLoadMoreBar';
+        loadMoreContainer.style.cssText = 'grid-column: 1/-1; text-align: center; margin-top: 32px; margin-bottom: 16px;';
 
-    function updateFavCount() {
-      favCount.textContent = favorites.length;
+        const t = translations[currentLang] || translations.ko;
+        const isAllShown = spotsDisplayLimit >= filtered.length;
+        const remaining = filtered.length - visibleSpots.length;
+
+        const btnText = isAllShown
+          ? `🔼 ${t.showLessSpots || (currentLang === 'ja' ? '折りたたむ' : (currentLang === 'ko' ? '명소 목록 접기 (처음으로)' : 'Show Less'))}`
+          : `✨ ${t.showMoreSpots || (currentLang === 'ja' ? 'もっと見せる' : (currentLang === 'ko' ? '더 많은 명소 보기' : 'Show More Spots'))} (+${remaining}개 더보기) 🔽`;
+
+        loadMoreContainer.innerHTML = `
+          <button type="button" id="btnLoadMoreSpots" style="padding: 13px 36px; background: linear-gradient(135deg, #3b82f6, #8b5cf6); border: none; border-radius: 30px; color: #ffffff; font-weight: 700; font-size: 0.98rem; cursor: pointer; box-shadow: 0 4px 18px rgba(59, 130, 246, 0.35); transition: all 0.3s ease;">
+            ${btnText}
+          </button>
+        `;
+        spotsGrid.appendChild(loadMoreContainer);
+
+        const btnLoadMore = document.getElementById('btnLoadMoreSpots');
+        btnLoadMore.addEventListener('click', () => {
+          if (isAllShown) {
+            spotsDisplayLimit = 12;
+            document.getElementById('spots').scrollIntoView({ behavior: 'smooth' });
+          } else {
+            spotsDisplayLimit += 12;
+          }
+          renderSpots();
+        });
+      }
     }
 
     function renderFavModal() {
