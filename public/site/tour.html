@@ -8600,22 +8600,31 @@
       const sInfo = getLocationQuery(startText, true);
       const eInfo = getLocationQuery(endText, false);
 
+      // Build Naver Maps URL: use place name search when coords are unknown
+      const buildNaverUrl = (sLat, sLng, sName, eLat, eLng, eName, mode) => {
+        const sHasCoord = sLat && sLng && sLat !== 35.16 && sLng !== 128.99 && sLat !== 35.16 && sLng !== 129.13;
+        const eHasCoord = eLat && eLng && eLat !== 35.16 && eLng !== 128.99 && eLat !== 35.16 && eLng !== 129.13;
+        const sParam = sHasCoord ? `${sLng},${sLat},${encodeURIComponent(sName)}` : `${encodeURIComponent(sName)}`;
+        const eParam = eHasCoord ? `${eLng},${eLat},${encodeURIComponent(eName)}` : `${encodeURIComponent(eName)}`;
+        return `https://map.naver.com/v5/directions/${sParam}/${eParam}/-/${mode}`;
+      };
+
       const buildNaverTransitUrl = (sLat, sLng, sName, eLat, eLng, eName) =>
-        `https://map.naver.com/v5/directions/${sLng},${sLat},${encodeURIComponent(sName)}/${eLng},${eLat},${encodeURIComponent(eName)}/-/transit?c=${sLng},${sLat},13,0,0,0,dh`;
+        buildNaverUrl(sLat, sLng, sName, eLat, eLng, eName, 'transit');
 
       const buildNaverTaxiUrl = (sLat, sLng, sName, eLat, eLng, eName) =>
-        `https://map.naver.com/v5/directions/${sLng},${sLat},${encodeURIComponent(sName)}/${eLng},${eLat},${encodeURIComponent(eName)}/-/car?c=${sLng},${sLat},13,0,0,0,dh`;
+        buildNaverUrl(sLat, sLng, sName, eLat, eLng, eName, 'car');
 
       const sFallback = sInfo.isCoord ? [sInfo.lat, sInfo.lng] : getCoordsForPlace(startText, true);
       const eFallback = eInfo.isCoord ? [eInfo.lat, eInfo.lng] : getCoordsForPlace(endText, false);
 
       let initialNaverTransitUrl = buildNaverTransitUrl(
-        sFallback[0], sFallback[1], sInfo.text,
-        eFallback[0], eFallback[1], eInfo.text
+        sFallback[0], sFallback[1], sInfo.text || startText,
+        eFallback[0], eFallback[1], eInfo.text || endText
       );
       let initialNaverTaxiUrl = buildNaverTaxiUrl(
-        sFallback[0], sFallback[1], sInfo.text,
-        eFallback[0], eFallback[1], eInfo.text
+        sFallback[0], sFallback[1], sInfo.text || startText,
+        eFallback[0], eFallback[1], eInfo.text || endText
       );
 
       let googleOrigin = sInfo.isCoord ? `${sInfo.lat},${sInfo.lng}` : encodeURIComponent(sInfo.text);
@@ -8710,10 +8719,10 @@
         const linkTaxi = document.getElementById('btnNaverTaxi');
         const linkTransit = document.getElementById('btnNaverTransit');
         if (linkTaxi) {
-          linkTaxi.href = buildNaverTaxiUrl(sCoord[0], sCoord[1], sInfo.text, eCoord[0], eCoord[1], eInfo.text);
+          linkTaxi.href = buildNaverTaxiUrl(sCoord[0], sCoord[1], startText, eCoord[0], eCoord[1], endText);
         }
         if (linkTransit) {
-          linkTransit.href = buildNaverTransitUrl(sCoord[0], sCoord[1], sInfo.text, eCoord[0], eCoord[1], eInfo.text);
+          linkTransit.href = buildNaverTransitUrl(sCoord[0], sCoord[1], startText, eCoord[0], eCoord[1], endText);
         }
       }).catch(() => { });
     }
