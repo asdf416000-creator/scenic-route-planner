@@ -8600,20 +8600,25 @@
       const sInfo = getLocationQuery(startText, true);
       const eInfo = getLocationQuery(endText, false);
 
-      // Build Naver Maps URL: use place name search when coords are unknown
-      const buildNaverUrl = (sLat, sLng, sName, eLat, eLng, eName, mode) => {
-        const sHasCoord = sLat && sLng && sLat !== 35.16 && sLng !== 128.99 && sLat !== 35.16 && sLng !== 129.13;
-        const eHasCoord = eLat && eLng && eLat !== 35.16 && eLng !== 128.99 && eLat !== 35.16 && eLng !== 129.13;
-        const sParam = sHasCoord ? `${sLng},${sLat},${encodeURIComponent(sName)}` : `${encodeURIComponent(sName)}`;
-        const eParam = eHasCoord ? `${eLng},${eLat},${encodeURIComponent(eName)}` : `${encodeURIComponent(eName)}`;
-        return `https://map.naver.com/v5/directions/${sParam}/${eParam}/-/${mode}`;
+      // Build Naver Maps URL: mobile directions format (sname/ename with optional coords)
+      const buildNaverUrl = (sLat, sLng, sName, eLat, eLng, eName, pathType) => {
+        let url = `https://m.map.naver.com/directions/?menu=route&sname=${encodeURIComponent(sName)}&ename=${encodeURIComponent(eName)}&pathType=${pathType}`;
+        // Add coordinates when available and not default fallback
+        const isDefaultCoord = (lat, lng) => (Math.abs(lat - 35.16) < 0.001 && (Math.abs(lng - 128.99) < 0.01 || Math.abs(lng - 129.13) < 0.01));
+        if (sLat && sLng && !isDefaultCoord(sLat, sLng)) {
+          url += `&slat=${sLat}&slng=${sLng}`;
+        }
+        if (eLat && eLng && !isDefaultCoord(eLat, eLng)) {
+          url += `&elat=${eLat}&elng=${eLng}`;
+        }
+        return url;
       };
 
       const buildNaverTransitUrl = (sLat, sLng, sName, eLat, eLng, eName) =>
-        buildNaverUrl(sLat, sLng, sName, eLat, eLng, eName, 'transit');
+        buildNaverUrl(sLat, sLng, sName, eLat, eLng, eName, 1);
 
       const buildNaverTaxiUrl = (sLat, sLng, sName, eLat, eLng, eName) =>
-        buildNaverUrl(sLat, sLng, sName, eLat, eLng, eName, 'car');
+        buildNaverUrl(sLat, sLng, sName, eLat, eLng, eName, 3);
 
       const sFallback = sInfo.isCoord ? [sInfo.lat, sInfo.lng] : getCoordsForPlace(startText, true);
       const eFallback = eInfo.isCoord ? [eInfo.lat, eInfo.lng] : getCoordsForPlace(endText, false);
