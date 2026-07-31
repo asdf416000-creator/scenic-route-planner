@@ -5384,8 +5384,8 @@
           const jaTitle = normalizePlaceKey(getLangText(spot.title, 'ja'));
           const enTitle = normalizePlaceKey(getLangText(spot.title, 'en'));
           if ((koTitle && (norm.includes(koTitle) || koTitle.includes(norm))) ||
-              (jaTitle && (norm.includes(jaTitle) || jaTitle.includes(norm))) ||
-              (enTitle && (norm.includes(enTitle) || enTitle.includes(norm)))) {
+            (jaTitle && (norm.includes(jaTitle) || jaTitle.includes(norm))) ||
+            (enTitle && (norm.includes(enTitle) || enTitle.includes(norm)))) {
             for (const [key, coord] of Object.entries(placeCoords)) {
               if (normalizePlaceKey(key) === koTitle) return coord;
             }
